@@ -7,3 +7,9 @@ tts/package-lock.json
 Trans.json
 ultimate.db
 lua/.luarc.json
+
+# >>> omo-senpi init-deep local (managed)
+# Do not edit this block; rerun init-deep or switch modes.
+/.omo/
+AGENTS.md
+# <<< omo-senpi init-deep local (managed)
