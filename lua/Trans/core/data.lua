@@ -1,6 +1,5 @@
 local Trans = require 'Trans'
 
-
 ---@class TransData
 ---@field from string @Source language type
 ---@field to string @Target language type
@@ -19,22 +18,25 @@ M.__index = M
 ---@return TransData
 function M.new(opts)
     local mode = opts.mode
-    local str  = opts.str
+    local str = opts.str
 
-
-    local strategy = Trans.conf.strategy[mode]
+    local strategy = Trans.conf.strategy.default
     local data = setmetatable({
-        str    = str,
-        mode   = mode,
+        str = str,
+        mode = mode,
         result = {},
-        trace  = {},
+        trace = {},
     }, M)
-
 
     data.frontend = Trans.frontend[strategy.frontend].new()
     data.backends = {}
-    for i, name in ipairs(strategy.backend) do
-        data.backends[i] = Trans.backend[name]
+    for _, name in ipairs(Trans.conf.order or {}) do
+        if name ~= Trans.conf.offline then
+            local backend = Trans.backend[name]
+            if not backend.is_configured or backend.is_configured() then
+                data.backends[#data.backends + 1] = backend
+            end
+        end
     end
 
     if Trans.util.is_english(str) then
@@ -61,14 +63,15 @@ end
 ---@field web? table<string, string[]>[]? @web definitions
 ---@field explains? string[]? @basic explains
 
-
 ---Get the first available result [return nil if no result]
 ---@return TransResult | false?
 ---@return string? backend.name
 function M:get_available_result()
     local result = self.result
 
-    if result['offline'] then return result['offline'], 'offline' end
+    if result['offline'] then
+        return result['offline'], 'offline'
+    end
 
     for _, backend in ipairs(self.backends) do
         if result[backend.name] then

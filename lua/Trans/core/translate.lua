@@ -8,14 +8,12 @@ local function init_opts(opts)
     return opts
 end
 
-
 ---To Do Online Query
 ---@param data TransData @data
 ---@param backend TransOnlineBackend @backend
 local function do_query(data, backend)
-    local name      = backend.name
-    local uri       = backend.uri
-    local method    = backend.method
+    local name = backend.name
+    local method = backend.method
     local formatter = backend.formatter
 
     local q_ok, query = pcall(backend.get_query, data)
@@ -25,21 +23,26 @@ local function do_query(data, backend)
     end
 
     local header
-    if backend.header then
-        local h_ok, h_res = pcall(function()
-            return type(backend.header) == 'function' and backend.header(data) or backend.header
-        end)
+    if type(backend.header) == 'function' then
+        local h_ok, h_res = pcall(backend.header, data)
         header = h_ok and h_res or nil
+    elseif type(backend.header) == 'table' then
+        header = backend.header
     end
 
+    local uri = backend.get_uri and backend.get_uri(data) or backend.uri
+
     local function handle(output)
+        if output.exit ~= 0 then
+            vim.notify(('%s 请求失败: %s'):format(name, output.error), vim.log.levels.WARN)
+        end
+
         local status, body = pcall(vim.json.decode, output.body)
         if not status or not body then
-            if not Trans.conf.debug then
-                if backend.debug then pcall(backend.debug, body) end
-                data.trace[name] = output
+            if backend.debug then
+                pcall(backend.debug, output.body)
             end
-
+            data.trace[name] = output
             data.result[name] = false
             return
         end
@@ -50,9 +53,11 @@ local function do_query(data, backend)
 
     local c_ok = pcall(function()
         Trans.curl[method](uri, {
-            query = query,
+            query = method == 'get' and query or nil,
+            body = method == 'post' and query or nil,
+            headers = header,
+            timeout = backend.timeout or 30,
             callback = handle,
-            header = header,
         })
     end)
 
@@ -65,9 +70,16 @@ end
 local strategy = {
     fallback = function(data)
         local result = data.result
-        Trans.backend.offline.query(data)
-
-        if result.offline then return true end
+        local offline = Trans.conf.offline
+        if offline then
+            local backend = Trans.backend[offline]
+            if backend and backend.query then
+                backend.query(data)
+                if result.offline then
+                    return true
+                end
+            end
+        end
 
         local update = data.frontend:wait()
         for _, backend in ipairs(data.backends) do
@@ -78,7 +90,9 @@ local strategy = {
             while result[name] == nil and update(backend) do
             end
 
-            if result[name] then return true end
+            if result[name] then
+                return true
+            end
         end
 
         return false
@@ -86,13 +100,13 @@ local strategy = {
     --- TODO :More Strategys
 }
 
-
 -- HACK : Core process logic
 local function process(opts)
     opts = init_opts(opts)
     local str = opts.str
-    if not str or str == '' then return end
-
+    if not str or str == '' then
+        return
+    end
 
     -- Find in cache
     if Trans.cache[str] then
@@ -109,7 +123,6 @@ local function process(opts)
         data.frontend:fallback()
     end
 end
-
 
 ---@class Trans
 ---@field translate fun(opts: { frontend: string?, mode: string?}?) Translate string core function

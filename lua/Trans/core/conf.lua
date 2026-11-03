@@ -1,19 +1,50 @@
 ---@class Trans
 ---@field conf TransConf
 
-
 ---@class TransConf
 return {
-    ---@type string the directory for database file and password file
-    dir      = require 'Trans'.plugin_dir,
-    debug    = true,
+    debug = false,
     ---@type 'default' | 'dracula' | 'tokyonight' global Trans theme [see lua/Trans/style/theme.lua]
-    theme    = 'default', -- default | tokyonight | dracula
+    theme = 'default', -- default | tokyonight | dracula
+    ---@type string? Offline backend name, set false to disable
+    offline = 'sdcv',
+    ---@type string[] Online backends in fallback order
+    order = { 'llm', 'google', 'azure', 'youdao', 'mymemory' },
+    ---@type table<string, table> Per-backend settings; secrets default to environment variables
+    backends = {
+        sdcv = {
+            cmd = 'sdcv',
+            args = { '-n', '-j', '-0', '-1', '-e' },
+        },
+        llm = {
+            base_url = 'https://api.deepseek.com',
+            model = 'deepseek-chat',
+            api_key = vim.env.DEEPSEEK_API_KEY,
+            temperature = 0.2,
+            timeout = 25,
+        },
+        google = {
+            api_key = vim.env.GOOGLE_TRANSLATE_API_KEY,
+            timeout = 25,
+        },
+        azure = {
+            api_key = vim.env.AZURE_TRANSLATOR_KEY,
+            region = vim.env.AZURE_TRANSLATOR_REGION,
+            timeout = 25,
+        },
+        youdao = {
+            app_id = vim.env.YOUDAO_APP_ID,
+            app_passwd = vim.env.YOUDAO_APP_SECRET,
+            timeout = 25,
+        },
+        mymemory = {
+            email = vim.env.MYMEMORY_EMAIL,
+            timeout = 25,
+        },
+    },
     strategy = {
-        ---@type { frontend:string, backend:string | string[] } fallback strategy for mode
         default = {
             frontend = 'hover',
-            backend = '*',
         },
     },
     ---@type table frontend options
@@ -21,13 +52,13 @@ return {
         ---@class TransFrontendOpts
         ---@field keymaps table<string, string>
         default = {
-            query     = 'fallback',
-            border    = 'rounded',
-            title     = vim.fn.has 'nvim-0.9' == 1 and {
-                    { '',       'TransTitleRound' },
-                    { '󰊿 Trans', 'TransTitle' },
-                    { '',       'TransTitleRound' },
-                } or nil, -- need nvim-0.9+
+            query = 'fallback',
+            border = 'rounded',
+            title = vim.fn.has 'nvim-0.9' == 1 and {
+                { '', 'TransTitleRound' },
+                { '󰊿 Trans', 'TransTitle' },
+                { '', 'TransTitleRound' },
+            } or nil, -- need nvim-0.9+
             auto_play = true,
             ---@type {open: string | boolean, close: string | boolean, interval: integer} Hover Window Animation
             animation = {
@@ -35,22 +66,22 @@ return {
                 close = 'slid',
                 interval = 12,
             },
-            timeout   = 2000,
+            timeout = 30000,
         },
         ---@class TransHoverOpts : TransFrontendOpts
         hover = {
             ---@type integer Max Width of Hover Window
-            width             = 37,
+            width = 37,
             ---@type integer Max Height of Hover Window
-            height            = 27,
+            height = 27,
             ---@type string -- see: /lua/Trans/style/spinner
-            spinner           = 'dots',
+            spinner = 'dots',
             ---@type string
-            fallback_message  = '{{notfound}} 翻译超时或没有找到相关的翻译',
-            auto_resize       = true,
-            split_width       = 60,
-            padding           = 10, -- padding for hover window width
-            keymaps           = {
+            fallback_message = '{{notfound}} 翻译超时或没有找到相关的翻译',
+            auto_resize = true,
+            split_width = 60,
+            padding = 10, -- padding for hover window width
+            keymaps = {
                 -- pageup       = '<C-u>',
                 -- pagedown     = '<C-d>',
                 -- pin          = '<leader>[',
@@ -66,7 +97,7 @@ return {
                 'BufLeave',
             },
             ---@type table<string, string[]> order to display translate result
-            order             = {
+            order = {
                 default = {
                     'str',
                     'translation',
@@ -87,25 +118,24 @@ return {
                     'web',
                 },
             },
-            icon              = {
+            icon = {
                 -- or use emoji
-                list        = '●', -- ● | ○ | ◉ | ◯ | ◇ | ◆ | ▪ | ▫ | ⬤ | 🟢 | 🟡 | 🟣 | 🟤 | 🟠| 🟦 | 🟨 | 🟧 | 🟥 | 🟪 | 🟫 | 🟩 | 🟦
-                star        = '', -- ⭐ | ✴ | ✳ | ✲ | ✱ | ✰ | ★ | ☆ | 🌟 | 🌠 | 🌙 | 🌛 | 🌜 | 🌟 | 🌠 | 🌌 | 🌙 |
-                notfound    = '󰆆 ', --❔ | ❓ | ❗ | ❕|
-                yes         = '✔', -- ✅ | ✔️ | ☑
-                no          = '', -- ❌ | ❎ | ✖ | ✘ | ✗ |
-                cell        = '■', -- ■  | □ | ▇ | ▏ ▎ ▍ ▌ ▋ ▊ ▉
-                web         = '󰖟', --🌍 | 🌎 | 🌏 | 🌐 |
-                tag         = '',
-                pos         = '',
-                exchange    = '',
-                definition  = '󰗊',
+                list = '●', -- ● | ○ | ◉ | ◯ | ◇ | ◆ | ▪ | ▫ | ⬤ | 🟢 | 🟡 | 🟣 | 🟤 | 🟠| 🟦 | 🟨 | 🟧 | 🟥 | 🟪 | 🟫 | 🟩 | 🟦
+                star = '', -- ⭐ | ✴ | ✳ | ✲ | ✱ | ✰ | ★ | ☆ | 🌟 | 🌠 | 🌙 | 🌛 | 🌜 | 🌟 | 🌠 | 🌌 | 🌙 |
+                notfound = '󰆆 ', --❔ | ❓ | ❗ | ❕|
+                yes = '✔', -- ✅ | ✔️ | ☑
+                no = '', -- ❌ | ❎ | ✖ | ✘ | ✗ |
+                cell = '■', -- ■  | □ | ▇ | ▏ ▎ ▍ ▌ ▋ ▊ ▉
+                web = '󰖟', --🌍 | 🌎 | 🌏 | 🌐 |
+                tag = '',
+                pos = '',
+                exchange = '',
+                definition = '󰗊',
                 translation = '󰊿',
             },
         },
     },
 }
-
 
 -- TODO :
 -- float = {
@@ -126,7 +156,6 @@ return {
 --         success = '#10b981',
 --     },
 -- },
-
 
 -- local title = {
 --     "████████╗██████╗  █████╗ ███╗   ██╗███████╗",
