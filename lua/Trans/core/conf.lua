@@ -17,9 +17,9 @@ return {
             args = { '-n', '-j', '-0', '-1', '-e' },
         },
         llm = {
-            base_url = 'https://api.deepseek.com',
-            model = 'deepseek-chat',
-            api_key = vim.env.DEEPSEEK_API_KEY,
+            base_url = vim.env.OPENAI_BASE_URL or 'https://api.openai.com/v1', -- any OpenAI-compatible endpoint
+            model = vim.env.OPENAI_MODEL or 'gpt-4o-mini',
+            api_key = vim.env.OPENAI_API_KEY,
             temperature = 0.2,
             timeout = 25,
         },

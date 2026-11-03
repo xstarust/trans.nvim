@@ -15,9 +15,9 @@ end
 
 local function resolve()
     return {
-        api_key = first_nonempty(M.api_key, vim.env.TRANSLATE_LLM_API_KEY, vim.env.DEEPSEEK_API_KEY),
-        base_url = first_nonempty(M.base_url) or 'https://api.deepseek.com',
-        model = M.model or 'deepseek-chat',
+        api_key = first_nonempty(M.api_key, vim.env.OPENAI_API_KEY),
+        base_url = first_nonempty(M.base_url, vim.env.OPENAI_BASE_URL) or 'https://api.openai.com/v1',
+        model = first_nonempty(M.model, vim.env.OPENAI_MODEL) or 'gpt-4o-mini',
         temperature = M.temperature or 0.2,
     }
 end

@@ -65,9 +65,9 @@ return {
         args = { "-n", "-j", "-0", "-1", "-e" },
       },
       llm = {
-        base_url = env.TRANSLATE_LLM_BASE_URL or "https://api.deepseek.com",
-        model = env.TRANSLATE_LLM_MODEL or "deepseek-chat",
-        api_key = env.DEEPSEEK_API_KEY,
+        base_url = env.OPENAI_BASE_URL, -- default: https://api.openai.com/v1
+        model = env.OPENAI_MODEL, -- default: gpt-4o-mini
+        api_key = env.OPENAI_API_KEY,
       },
       google = { api_key = env.GOOGLE_TRANSLATE_API_KEY },
       azure = {
@@ -107,7 +107,7 @@ return {
 
 | Provider | Backend | Configuration |
 | --- | --- | --- |
-| LLM | OpenAI-compatible `/chat/completions` | `base_url`, `model`, `api_key` |
+| LLM | OpenAI-compatible `/chat/completions` | `base_url` (default `https://api.openai.com/v1`), `model` (default `gpt-4o-mini`), `api_key` |
 | Google | Cloud Translation v2 | `api_key` (billing account required) |
 | Azure | Translator v3 | `api_key`, optional `region` (F0: 2M chars/month) |
 | Youdao | OpenAPI v3 | `app_id`, `app_passwd` |
@@ -116,9 +116,9 @@ return {
 Environment variables used by the default config:
 
 ```text
-DEEPSEEK_API_KEY
-TRANSLATE_LLM_BASE_URL
-TRANSLATE_LLM_MODEL
+OPENAI_API_KEY
+OPENAI_BASE_URL
+OPENAI_MODEL
 GOOGLE_TRANSLATE_API_KEY
 AZURE_TRANSLATOR_KEY
 AZURE_TRANSLATOR_REGION
@@ -153,6 +153,9 @@ Checks `sdcv`, loaded dictionaries, `curl`, and which providers are configured.
   online providers.
 - Provider calls use `vim.system` with argument lists, so buffer text is never passed
   through a shell.
+- The LLM backend speaks the OpenAI `/chat/completions` protocol. Point `OPENAI_BASE_URL` at
+  any compatible gateway (DeepSeek, Moonshot, Zhipu, Qwen, OpenRouter, or a local
+  `http://localhost:11434/v1` for Ollama) and set `OPENAI_MODEL` to a model it serves.
 - MIT licensed; see `LICENCE`. The referenced projects are credited at the end of this file.
 
 ## Credits
