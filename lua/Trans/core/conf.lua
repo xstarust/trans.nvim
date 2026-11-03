@@ -59,7 +59,7 @@ return {
                 { '󰊿 Trans', 'TransTitle' },
                 { '', 'TransTitleRound' },
             } or nil, -- need nvim-0.9+
-            auto_play = true,
+            auto_play = true, -- speak single words only; paragraph results are never auto-played
             ---@type {open: string | boolean, close: string | boolean, interval: integer} Hover Window Animation
             animation = {
                 open = 'slid', -- 'fold', 'slid'

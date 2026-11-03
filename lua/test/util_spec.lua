@@ -91,6 +91,20 @@ describe('util.is_word', function()
     end)
 end)
 
+describe('util.is_paragraph', function()
+    it('detects whitespace separated text', function()
+        for test, value in pairs {
+            ['hello']         = false,
+            ['你好']          = false,
+            ['hello world']   = true,
+            ['hello\nworld']  = true,
+            ['one two three'] = true,
+        } do
+            assert.are.same(util.is_paragraph(test), value)
+        end
+    end)
+end)
+
 describe('util.replace_chinese_punctuation', function()
     it('replaces Chinese punctuation with English punctuation', function()
         local input = '你好，世界。欢迎！你在这里吗？'

@@ -212,7 +212,7 @@ function M:process(data)
     local opts   = self.opts
     local buffer = self.buffer
 
-    if opts.auto_play then
+    if opts.auto_play and not util.is_paragraph(data.str) then
         local text_to_play
         if data.from == 'en' then
             text_to_play = data.str

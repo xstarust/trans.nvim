@@ -239,6 +239,13 @@ function M.is_word(str)
     return str:find '%W' == nil
 end
 
+---Detect whether the string spans multiple words or lines
+---@param str string
+---@return boolean
+function M.is_paragraph(str)
+    return str:find '%s' ~= nil
+end
+
 ---@param list any[]
 ---@param step table
 ---@return any[]
