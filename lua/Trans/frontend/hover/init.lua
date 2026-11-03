@@ -215,7 +215,7 @@ function M:process(data)
     if opts.auto_play and not util.is_paragraph(data.str) then
         local text_to_play
         if data.from == 'en' then
-            text_to_play = data.str
+            text_to_play = data.query_str or data.str
         elseif result and result.definition and result.definition[1] then
             text_to_play = result.definition[1]
         elseif result and result.translation and result.translation[1] then

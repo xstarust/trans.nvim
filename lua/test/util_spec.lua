@@ -105,6 +105,23 @@ describe('util.is_paragraph', function()
     end)
 end)
 
+describe('util.normalize_identifier', function()
+    it('splits identifiers into words for provider queries', function()
+        for test, value in pairs {
+            ['hello']                = 'hello',
+            ['extend_mini_files']    = 'extend mini files',
+            ['extendMiniFiles']      = 'extend Mini Files',
+            ['HTTPServer']           = 'HTTP Server',
+            ['__init__']             = 'init',
+            ['extend_mini_files.lua'] = 'extend mini files lua',
+            ['already spaced text']  = 'already spaced text',
+            ['__']                   = '__',
+        } do
+            assert.are.same(value, util.normalize_identifier(test))
+        end
+    end)
+end)
+
 describe('util.replace_chinese_punctuation', function()
     it('replaces Chinese punctuation with English punctuation', function()
         local input = '你好，世界。欢迎！你在这里吗？'

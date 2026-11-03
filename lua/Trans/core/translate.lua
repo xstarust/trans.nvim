@@ -16,7 +16,8 @@ local function do_query(data, backend)
     local method = backend.method
     local formatter = backend.formatter
 
-    local q_ok, query = pcall(backend.get_query, data)
+    local query_data = vim.tbl_extend('force', data, { str = data.query_str })
+    local q_ok, query = pcall(backend.get_query, query_data)
     if not q_ok or not query then
         data.result[name] = false
         return

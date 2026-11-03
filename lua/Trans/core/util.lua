@@ -246,6 +246,22 @@ function M.is_paragraph(str)
     return str:find '%s' ~= nil
 end
 
+---Turn a single-token identifier into space separated words for provider queries
+---@param str string
+---@return string
+function M.normalize_identifier(str)
+    if str:find '%s' then
+        return str
+    end
+
+    local words = str:gsub('[%._%-/\\]+', ' ')
+    words = words:gsub('(%u+)(%u%l)', '%1 %2')
+    words = words:gsub('(%l)(%u)', '%1 %2')
+    words = vim.trim((words:gsub('%s+', ' ')))
+
+    return words ~= '' and words or str
+end
+
 ---@param list any[]
 ---@param step table
 ---@return any[]

@@ -5,6 +5,7 @@ local Trans = require 'Trans'
 ---@field to string @Target language type
 ---@field is_word boolean @Is the str a word
 ---@field str string @The original string
+---@field query_str string @The string sent to providers (identifiers split into words)
 ---@field mode string @The mode of the str
 ---@field result table<string, TransResult|nil|false> @The result of the translation
 ---@field frontend TransFrontend
@@ -23,6 +24,7 @@ function M.new(opts)
     local strategy = Trans.conf.strategy.default
     local data = setmetatable({
         str = str,
+        query_str = Trans.util.normalize_identifier(str),
         mode = mode,
         result = {},
         trace = {},
