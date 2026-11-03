@@ -111,6 +111,7 @@ describe('util.normalize_identifier', function()
             ['hello']                = 'hello',
             ['extend_mini_files']    = 'extend mini files',
             ['extendMiniFiles']      = 'extend Mini Files',
+            ['LazyExtras']            = 'Lazy Extras',
             ['HTTPServer']           = 'HTTP Server',
             ['__init__']             = 'init',
             ['extend_mini_files.lua'] = 'extend mini files lua',
@@ -119,6 +120,45 @@ describe('util.normalize_identifier', function()
         } do
             assert.are.same(value, util.normalize_identifier(test))
         end
+    end)
+end)
+
+describe('util.word_at', function()
+    it('extracts the sub-word under a byte column', function()
+        local line = 'extend_mini_files.lua'
+        assert.are.equal('extend', util.word_at(line, 0))
+        assert.are.equal('extend', util.word_at(line, 5))
+        assert.are.equal('mini', util.word_at(line, 7))
+        assert.are.equal('files', util.word_at(line, 14))
+        assert.are.equal('', util.word_at(line, 17))
+        assert.are.equal('lua', util.word_at(line, 18))
+        assert.are.equal('hello', util.word_at('hello world', 0))
+        assert.are.equal('world', util.word_at('hello world', 6))
+        assert.are.equal('你好世界', util.word_at('你好世界', 0))
+        assert.are.equal('', util.word_at('', 0))
+    end)
+
+    it('splits camelCase and acronyms at case boundaries', function()
+        local lazy = 'LazyExtras'
+        assert.are.equal('Lazy', util.word_at(lazy, 0))
+        assert.are.equal('Lazy', util.word_at(lazy, 3))
+        assert.are.equal('Extras', util.word_at(lazy, 4))
+        assert.are.equal('Extras', util.word_at(lazy, 9))
+
+        local http = 'HTTPServer'
+        assert.are.equal('HTTP', util.word_at(http, 0))
+        assert.are.equal('HTTP', util.word_at(http, 3))
+        assert.are.equal('Server', util.word_at(http, 4))
+
+        local mixed = 'getHTTPResponse'
+        assert.are.equal('get', util.word_at(mixed, 1))
+        assert.are.equal('HTTP', util.word_at(mixed, 4))
+        assert.are.equal('Response', util.word_at(mixed, 8))
+
+        local digits = 'v2Server'
+        assert.are.equal('v2', util.word_at(digits, 1))
+        assert.are.equal('Server', util.word_at(digits, 2))
+        assert.are.equal('hello', util.word_at('hello', 2))
     end)
 end)
 

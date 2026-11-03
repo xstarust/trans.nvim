@@ -97,7 +97,14 @@ end
 function M.get_str(mode)
     return ({
         n = function()
-            return fn.expand '<cword>'
+            local cword = fn.expand '<cword>'
+            local is_compound = cword:find '_' or cword:find '%l%u' or cword:find '%u%u%l'
+            if not is_compound then
+                return cword
+            end
+
+            local word = M.word_at(fn.getline '.', fn.col '.' - 1)
+            return word ~= '' and word or cword
         end,
         v = function()
             api.nvim_input '<Esc>'
@@ -237,6 +244,85 @@ end
 ---@return boolean
 function M.is_word(str)
     return str:find '%W' == nil
+end
+
+---@param byte integer?
+---@return boolean
+local function is_word_byte(byte)
+    if not byte then
+        return false
+    end
+
+    local digits = byte >= 48 and byte <= 57
+    local upper = byte >= 65 and byte <= 90
+    local lower = byte >= 97 and byte <= 122
+
+    return byte >= 128 or digits or upper or lower
+end
+
+---@param run string
+---@return integer[]
+local function camel_starts(run)
+    local starts = { 1 }
+    for i = 2, #run do
+        local prev = run:byte(i - 1)
+        local cur = run:byte(i)
+        local after = run:byte(i + 1)
+
+        local prev_lower = prev >= 97 and prev <= 122
+        local prev_digit = prev >= 48 and prev <= 57
+        local prev_upper = prev >= 65 and prev <= 90
+        local cur_upper = cur >= 65 and cur <= 90
+        local after_lower = after ~= nil and after >= 97 and after <= 122
+
+        if (prev_lower or prev_digit) and cur_upper then
+            starts[#starts + 1] = i
+        elseif prev_upper and cur_upper and after_lower then
+            starts[#starts + 1] = i
+        end
+    end
+
+    return starts
+end
+
+---Extract the word under a 0-based byte column, treating punctuation and case changes as boundaries
+---@param line string
+---@param col integer
+---@return string
+function M.word_at(line, col)
+    if line == '' then
+        return ''
+    end
+
+    local index = math.min(math.max(col, 0), #line - 1) + 1
+    if not is_word_byte(line:byte(index)) then
+        return ''
+    end
+
+    local start = index
+    while start > 1 and is_word_byte(line:byte(start - 1)) do
+        start = start - 1
+    end
+
+    local finish = index
+    while finish < #line and is_word_byte(line:byte(finish + 1)) do
+        finish = finish + 1
+    end
+
+    local run = line:sub(start, finish)
+    local offset = index - start + 1
+
+    local seg_start, seg_finish = 1, #run
+    for _, boundary in ipairs(camel_starts(run)) do
+        if boundary <= offset then
+            seg_start = boundary
+        else
+            seg_finish = boundary - 1
+            break
+        end
+    end
+
+    return run:sub(seg_start, seg_finish)
 end
 
 ---Detect whether the string spans multiple words or lines
