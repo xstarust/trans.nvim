@@ -81,10 +81,10 @@ describe('util.is_word', function()
     it('can detect word', function()
         for test, value in pairs {
             ['あうえお'] = false,
-            ['hello']        = true,
-            [' hello']       = false,
-            ['hello world']  = false,
-            ['test_cool']    = false,
+            ['hello'] = true,
+            [' hello'] = false,
+            ['hello world'] = false,
+            ['test_cool'] = false,
         } do
             assert.are.same(util.is_word(test), value)
         end
@@ -94,10 +94,10 @@ end)
 describe('util.is_paragraph', function()
     it('detects whitespace separated text', function()
         for test, value in pairs {
-            ['hello']         = false,
-            ['你好']          = false,
-            ['hello world']   = true,
-            ['hello\nworld']  = true,
+            ['hello'] = false,
+            ['你好'] = false,
+            ['hello world'] = true,
+            ['hello\nworld'] = true,
             ['one two three'] = true,
         } do
             assert.are.same(util.is_paragraph(test), value)
@@ -108,15 +108,15 @@ end)
 describe('util.normalize_identifier', function()
     it('splits identifiers into words for provider queries', function()
         for test, value in pairs {
-            ['hello']                = 'hello',
-            ['extend_mini_files']    = 'extend mini files',
-            ['extendMiniFiles']      = 'extend Mini Files',
-            ['LazyExtras']            = 'Lazy Extras',
-            ['HTTPServer']           = 'HTTP Server',
-            ['__init__']             = 'init',
+            ['hello'] = 'hello',
+            ['extend_mini_files'] = 'extend mini files',
+            ['extendMiniFiles'] = 'extend Mini Files',
+            ['LazyExtras'] = 'Lazy Extras',
+            ['HTTPServer'] = 'HTTP Server',
+            ['__init__'] = 'init',
             ['extend_mini_files.lua'] = 'extend mini files lua',
-            ['already spaced text']  = 'already spaced text',
-            ['__']                   = '__',
+            ['already spaced text'] = 'already spaced text',
+            ['__'] = '__',
         } do
             assert.are.same(value, util.normalize_identifier(test))
         end

@@ -18,7 +18,6 @@ local M = Trans.metatable('frontend.hover', {
 })
 M.__index = M
 
-
 ---Set up function which will be invoked when this module is loaded
 function M.setup()
     local set = vim.keymap.set
@@ -93,14 +92,14 @@ function M:init_window(opts)
         buffer = self.buffer,
         animation = m_opts.animation,
         win_opts = {
-            relative  = opts.relative or 'cursor',
-            col       = opts.col or 1,
-            row       = opts.row or 1,
-            width     = opts.width or m_opts.width,
-            height    = opts.height or m_opts.height,
-            title     = m_opts.title,
+            relative = opts.relative or 'cursor',
+            col = opts.col or 1,
+            row = opts.row or 1,
+            width = opts.width or m_opts.width,
+            height = opts.height or m_opts.height,
+            title = m_opts.title,
             title_pos = m_opts.title and 'center',
-            zindex    = 100,
+            zindex = 100,
         },
     }
 
@@ -119,13 +118,13 @@ end
 ---Get Check function for waiting
 ---@return fun(backend: TransBackend): boolean
 function M:wait()
-    local opts     = self.opts
-    local buffer   = self.buffer
-    local pause    = util.pause
-    local cell     = opts.icon.cell
-    local spinner  = Trans.style.spinner[opts.spinner]
-    local times    = opts.width - spinner[1]:width()
-    local size     = #spinner
+    local opts = self.opts
+    local buffer = self.buffer
+    local pause = util.pause
+    local cell = opts.icon.cell
+    local spinner = Trans.style.spinner[opts.spinner]
+    local times = opts.width - spinner[1]:width()
+    local size = #spinner
     local interval = math.floor(opts.timeout / times)
 
     self:init_window {
@@ -134,9 +133,9 @@ function M:wait()
     }
 
     self.waitting = true
-    local cur     = 0
-    local pr      = util.node.prompt
-    local it      = util.node.item
+    local cur = 0
+    local pr = util.node.prompt
+    local it = util.node.item
     return function(backend)
         cur = cur + 1
         buffer[1] = pr(backend.name_zh)
@@ -150,7 +149,6 @@ end
 function M:fallback()
     local opts = self.opts
     local fallback_msg = self:icon_format(opts.fallback_message)
-
 
     local buffer = self.buffer
     buffer:wipe()
@@ -178,7 +176,9 @@ function M:defer()
         self.buffer:set('modifiable', false)
 
         local auto_close_events = self.opts.auto_close_events
-        if not auto_close_events then return end
+        if not auto_close_events then
+            return
+        end
 
         vim.api.nvim_create_autocmd(auto_close_events, {
             callback = function(opts)
@@ -209,7 +209,7 @@ function M:process(data)
         return
     end
 
-    local opts   = self.opts
+    local opts = self.opts
     local buffer = self.buffer
 
     if opts.auto_play and not util.is_paragraph(data.str) then
@@ -223,7 +223,9 @@ function M:process(data)
         end
 
         if text_to_play and type(text_to_play) == 'string' then
-            pcall(function() text_to_play:play() end)
+            pcall(function()
+                text_to_play:play()
+            end)
         end
     end
 
@@ -239,14 +241,11 @@ function M:process(data)
     local lines = buffer:lines()
 
     local valid = window and window:is_valid()
-    local width =
-        valid and
-        (opts.auto_resize and
-            math.max(
+    local width = valid
+            and (opts.auto_resize and math.max(
                 math.min(opts.width, util.display_width(lines) + opts.padding),
                 math.min(data.str:width(), opts.split_width)
-            )
-            or opts.width)
+            ) or opts.width)
         or math.min(opts.width, util.display_width(lines) + opts.padding)
 
     local height = math.min(opts.height, util.display_height(lines, width))

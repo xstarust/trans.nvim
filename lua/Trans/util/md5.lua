@@ -35,20 +35,18 @@ local md5 = {}
 
 -- bit lib implementions
 
-local char, byte, format, rep, sub =
-string.char, string.byte, string.format, string.rep, string.sub
+local char, byte, format, rep, sub = string.char, string.byte, string.format, string.rep, string.sub
 local bit_or, bit_and, bit_not, bit_xor, bit_rshift, bit_lshift
 
 local ok, bit = pcall(require, 'bit')
 local ok_ffi, ffi = pcall(require, 'ffi')
 if ok then
-    bit_or, bit_and, bit_not, bit_xor, bit_rshift, bit_lshift = bit.bor, bit.band, bit.bnot, bit.bxor, bit.rshift,
-        bit.lshift
+    bit_or, bit_and, bit_not, bit_xor, bit_rshift, bit_lshift =
+        bit.bor, bit.band, bit.bnot, bit.bxor, bit.rshift, bit.lshift
 else
     ok, bit = pcall(require, 'bit32')
 
     if ok then
-
         bit_not = bit.bnot
 
         local tobit = function(n)
@@ -56,14 +54,14 @@ else
         end
 
         local normalize = function(f)
-            return function(a, b) return tobit(f(tobit(a), tobit(b))) end
+            return function(a, b)
+                return tobit(f(tobit(a), tobit(b)))
+            end
         end
 
         bit_or, bit_and, bit_xor = normalize(bit.bor), normalize(bit.band), normalize(bit.bxor)
         bit_rshift, bit_lshift = normalize(bit.rshift), normalize(bit.lshift)
-
     else
-
         local function tbl2number(tbl)
             local result = 0
             local power = 1
@@ -76,7 +74,7 @@ else
 
         local function expand(t1, t2)
             local big, small = t1, t2
-            if (#big < #small) then
+            if #big < #small then
                 big, small = small, big
             end
             -- expand small
@@ -91,7 +89,7 @@ else
             local tbl = to_bits(n)
             local size = math.max(#tbl, 32)
             for i = 1, size do
-                if (tbl[i] == 1) then
+                if tbl[i] == 1 then
                     tbl[i] = 0
                 else
                     tbl[i] = 1
@@ -102,7 +100,7 @@ else
 
         -- defined as local above
         to_bits = function(n)
-            if (n < 0) then
+            if n < 0 then
                 -- negative
                 return to_bits(bit_not(math.abs(n)) + 1)
             end
@@ -111,10 +109,10 @@ else
             local cnt = 1
             local last
             while n > 0 do
-                last     = n % 2
+                last = n % 2
                 tbl[cnt] = last
-                n        = (n - last) / 2
-                cnt      = cnt + 1
+                n = (n - last) / 2
+                cnt = cnt + 1
             end
 
             return tbl
@@ -127,7 +125,7 @@ else
 
             local tbl = {}
             for i = 1, #tbl_m do
-                if (tbl_m[i] == 0 and tbl_n[i] == 0) then
+                if tbl_m[i] == 0 and tbl_n[i] == 0 then
                     tbl[i] = 0
                 else
                     tbl[i] = 1
@@ -144,7 +142,7 @@ else
 
             local tbl = {}
             for i = 1, #tbl_m do
-                if (tbl_m[i] == 0 or tbl_n[i] == 0) then
+                if tbl_m[i] == 0 or tbl_n[i] == 0 then
                     tbl[i] = 0
                 else
                     tbl[i] = 1
@@ -161,7 +159,7 @@ else
 
             local tbl = {}
             for i = 1, #tbl_m do
-                if (tbl_m[i] ~= tbl_n[i]) then
+                if tbl_m[i] ~= tbl_n[i] then
                     tbl[i] = 1
                 else
                     tbl[i] = 0
@@ -173,7 +171,7 @@ else
 
         bit_rshift = function(n, bits)
             local high_bit = 0
-            if (n < 0) then
+            if n < 0 then
                 -- negative
                 n = bit_not(math.abs(n)) + 1
                 high_bit = 0x80000000
@@ -189,7 +187,7 @@ else
         end
 
         bit_lshift = function(n, bits)
-            if (n < 0) then
+            if n < 0 then
                 -- negative
                 n = bit_not(math.abs(n)) + 1
             end
@@ -206,16 +204,18 @@ end
 local lei2str
 -- function is defined this way to allow full jit compilation (removing UCLO instruction in LuaJIT)
 if ok_ffi then
-    local ct_IntType = ffi.typeof("int[1]")
-    lei2str = function(i) return ffi.string(ct_IntType(i), 4) end
+    local ct_IntType = ffi.typeof 'int[1]'
+    lei2str = function(i)
+        return ffi.string(ct_IntType(i), 4)
+    end
 else
     lei2str = function(i)
-        local f = function(s) return char(bit_and(bit_rshift(i, s), 255)) end
+        local f = function(s)
+            return char(bit_and(bit_rshift(i, s), 255))
+        end
         return f(0) .. f(8) .. f(16) .. f(24)
     end
 end
-
-
 
 -- convert raw string to big-endian int
 local function str2bei(s)
@@ -230,8 +230,8 @@ end
 local str2lei
 
 if ok_ffi then
-    local ct_constcharptr = ffi.typeof("const char*")
-    local ct_constintptr = ffi.typeof("const int*")
+    local ct_constcharptr = ffi.typeof 'const char*'
+    local ct_constintptr = ffi.typeof 'const int*'
     str2lei = function(s)
         local int = ct_constcharptr(s)
         return ffi.cast(ct_constintptr, int)[0]
@@ -245,7 +245,6 @@ else
         return v
     end
 end
-
 
 -- cut up a string in little-endian ints of given size
 local function cut_le_str(s)
@@ -273,29 +272,88 @@ end
 -- 10/02/2001 jcw@equi4.com
 
 local CONSTS = {
-    0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
-    0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
-    0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
-    0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
-    0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
-    0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
-    0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
-    0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
-    0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
-    0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
-    0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
-    0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
-    0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
-    0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
-    0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
-    0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
-    0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476
+    0xd76aa478,
+    0xe8c7b756,
+    0x242070db,
+    0xc1bdceee,
+    0xf57c0faf,
+    0x4787c62a,
+    0xa8304613,
+    0xfd469501,
+    0x698098d8,
+    0x8b44f7af,
+    0xffff5bb1,
+    0x895cd7be,
+    0x6b901122,
+    0xfd987193,
+    0xa679438e,
+    0x49b40821,
+    0xf61e2562,
+    0xc040b340,
+    0x265e5a51,
+    0xe9b6c7aa,
+    0xd62f105d,
+    0x02441453,
+    0xd8a1e681,
+    0xe7d3fbc8,
+    0x21e1cde6,
+    0xc33707d6,
+    0xf4d50d87,
+    0x455a14ed,
+    0xa9e3e905,
+    0xfcefa3f8,
+    0x676f02d9,
+    0x8d2a4c8a,
+    0xfffa3942,
+    0x8771f681,
+    0x6d9d6122,
+    0xfde5380c,
+    0xa4beea44,
+    0x4bdecfa9,
+    0xf6bb4b60,
+    0xbebfbc70,
+    0x289b7ec6,
+    0xeaa127fa,
+    0xd4ef3085,
+    0x04881d05,
+    0xd9d4d039,
+    0xe6db99e5,
+    0x1fa27cf8,
+    0xc4ac5665,
+    0xf4292244,
+    0x432aff97,
+    0xab9423a7,
+    0xfc93a039,
+    0x655b59c3,
+    0x8f0ccc92,
+    0xffeff47d,
+    0x85845dd1,
+    0x6fa87e4f,
+    0xfe2ce6e0,
+    0xa3014314,
+    0x4e0811a1,
+    0xf7537e82,
+    0xbd3af235,
+    0x2ad7d2bb,
+    0xeb86d391,
+    0x67452301,
+    0xefcdab89,
+    0x98badcfe,
+    0x10325476,
 }
 
-local f = function(x, y, z) return bit_or(bit_and(x, y), bit_and(-x - 1, z)) end
-local g = function(x, y, z) return bit_or(bit_and(x, z), bit_and(y, -z - 1)) end
-local h = function(x, y, z) return bit_xor(x, bit_xor(y, z)) end
-local i = function(x, y, z) return bit_xor(y, bit_or(x, -z - 1)) end
+local f = function(x, y, z)
+    return bit_or(bit_and(x, y), bit_and(-x - 1, z))
+end
+local g = function(x, y, z)
+    return bit_or(bit_and(x, z), bit_and(y, -z - 1))
+end
+local h = function(x, y, z)
+    return bit_xor(x, bit_xor(y, z))
+end
+local i = function(x, y, z)
+    return bit_xor(y, bit_or(x, -z - 1))
+end
 local z = function(ff, a, b, c, d, x, s, ac)
     a = bit_and(a + ff(b, c, d) + x + ac, 0xFFFFFFFF)
     -- be *very* careful that left shift does not cause rounding!
@@ -374,8 +432,10 @@ local function transform(A, B, C, D, X)
     c = z(i, c, d, a, b, X[2], 15, t[63])
     b = z(i, b, c, d, a, X[9], 21, t[64])
 
-    return bit_and(A + a, 0xFFFFFFFF), bit_and(B + b, 0xFFFFFFFF),
-        bit_and(C + c, 0xFFFFFFFF), bit_and(D + d, 0xFFFFFFFF)
+    return bit_and(A + a, 0xFFFFFFFF),
+        bit_and(B + b, 0xFFFFFFFF),
+        bit_and(C + c, 0xFFFFFFFF),
+        bit_and(D + d, 0xFFFFFFFF)
 end
 
 ----------------------------------------------------------------
@@ -397,12 +457,18 @@ local function md5_finish(self)
     local msgLen = self.pos
     local padLen = 56 - msgLen % 64
 
-    if msgLen % 64 > 56 then padLen = padLen + 64 end
+    if msgLen % 64 > 56 then
+        padLen = padLen + 64
+    end
 
-    if padLen == 0 then padLen = 64 end
+    if padLen == 0 then
+        padLen = 64
+    end
 
-    local s = char(128) ..
-        rep(char(0), padLen - 1) .. lei2str(bit_and(8 * msgLen, 0xFFFFFFFF)) .. lei2str(math.floor(msgLen / 0x20000000))
+    local s = char(128)
+        .. rep(char(0), padLen - 1)
+        .. lei2str(bit_and(8 * msgLen, 0xFFFFFFFF))
+        .. lei2str(math.floor(msgLen / 0x20000000))
     md5_update(self, s)
 
     assert(self.pos % 64 == 0)
@@ -412,16 +478,26 @@ end
 ----------------------------------------------------------------
 
 function md5.new()
-    return { a = CONSTS[65], b = CONSTS[66], c = CONSTS[67], d = CONSTS[68],
+    return {
+        a = CONSTS[65],
+        b = CONSTS[66],
+        c = CONSTS[67],
+        d = CONSTS[68],
         pos = 0,
         buf = '',
         update = md5_update,
-        finish = md5_finish }
+        finish = md5_finish,
+    }
 end
 
 function md5.tohex(s)
-    return format("%08x%08x%08x%08x", str2bei(sub(s, 1, 4)), str2bei(sub(s, 5, 8)), str2bei(sub(s, 9, 12)),
-        str2bei(sub(s, 13, 16)))
+    return format(
+        '%08x%08x%08x%08x',
+        str2bei(sub(s, 1, 4)),
+        str2bei(sub(s, 5, 8)),
+        str2bei(sub(s, 9, 12)),
+        str2bei(sub(s, 13, 16))
+    )
 end
 
 function md5.sum(s)

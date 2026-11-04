@@ -56,7 +56,7 @@ function M.get_query(data)
     end
 
     local target = data.from == 'en' and 'Simplified Chinese' or 'English'
-    return vim.json.encode({
+    return vim.json.encode {
         model = conf.model,
         temperature = conf.temperature,
         stream = false,
@@ -69,7 +69,7 @@ function M.get_query(data)
             },
             { role = 'user', content = data.str },
         },
-    })
+    }
 end
 
 ---@return table<string, string>

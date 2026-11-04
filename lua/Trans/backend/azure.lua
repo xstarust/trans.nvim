@@ -32,7 +32,7 @@ end
 ---@param data TransData
 ---@return string
 function M.get_query(data)
-    return vim.json.encode({ { Text = data.str } })
+    return vim.json.encode { { Text = data.str } }
 end
 
 ---@param body table

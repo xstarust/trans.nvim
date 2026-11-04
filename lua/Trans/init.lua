@@ -19,11 +19,10 @@ end
 ---@field play function @Use tts to play string
 
 local uname = vim.loop.os_uname().sysname
-local system =
-    uname == 'Darwin' and 'mac' or
-    uname == 'Windows_NT' and 'win' or
-    uname == 'Linux' and (vim.fn.executable 'termux-api-start' == 1 and 'termux' or 'linux') or
-    error 'Unknown System, Please Report Issue'
+local system = uname == 'Darwin' and 'mac'
+    or uname == 'Windows_NT' and 'win'
+    or uname == 'Linux' and (vim.fn.executable 'termux-api-start' == 1 and 'termux' or 'linux')
+    or error 'Unknown System, Please Report Issue'
 
 ---@class Trans
 ---@field style table @Style module
@@ -31,9 +30,9 @@ local system =
 ---@field plugin_dir string @Plugin directory
 ---@field system 'mac'|'win'|'termux'|'linux' @Operating system
 local M = metatable('core', {
-    cache      = {},
-    style      = metatable 'style',
-    system     = system,
+    cache = {},
+    style = metatable 'style',
+    system = system,
     plugin_dir = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':p:h:h:h'),
 })
 

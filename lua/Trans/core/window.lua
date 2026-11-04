@@ -72,15 +72,17 @@ end
 ---|{ field: 'width'|'height', to: integer}
 function window:smooth_expand(opts)
     local field = opts.field -- width | height
-    local from  = api['nvim_win_get_' .. field](self.winid)
-    local to    = opts.to
+    local from = api['nvim_win_get_' .. field](self.winid)
+    local to = opts.to
 
-    if from == to then return end
+    if from == to then
+        return
+    end
 
-    local pause  = Trans.util.pause
+    local pause = Trans.util.pause
     local method = api['nvim_win_set_' .. field]
 
-    local wrap   = self:option 'wrap'
+    local wrap = self:option 'wrap'
     self:set('wrap', false)
     local interval = self.animation.interval or 12
     for i = from + 1, to, (from < to and 1 or -1) do
@@ -124,7 +126,6 @@ function window:try_close()
         }
     end
 
-
     pcall(api.nvim_win_close, self.winid, true)
 end
 
@@ -160,10 +161,8 @@ end
 
 window.__index = window
 
-
 ---@alias WindowOpts
 ---|{style: string, border: string, focusable: boolean, noautocmd?: boolean, relative: 'mouse'|'cursor'|'editor'|'win', width: integer, height: integer, col: integer, row: integer, zindex?: integer, title?: table | string}
-
 
 ---@class TransWindow
 ---@field buffer TransBuffer attached buffer object
@@ -185,8 +184,8 @@ window.__index = window
 -- }
 
 local default_opts = {
-    enter    = false,
-    winid    = -1,
+    enter = false,
+    winid = -1,
     ---@type WindowOpts
     win_opts = {
         -- INFO : ensured options
@@ -196,8 +195,8 @@ local default_opts = {
         -- height
         -- relative
         -- zindex
-        style     = 'minimal',
-        border    = 'rounded',
+        style = 'minimal',
+        border = 'rounded',
         focusable = true,
         noautocmd = true,
     },

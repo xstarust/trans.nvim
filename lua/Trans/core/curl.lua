@@ -35,11 +35,11 @@ local function request(method, uri, opts)
     vim.list_extend(cmd, { uri })
 
     vim.system(cmd, { text = true }, function(obj)
-        opts.callback({
+        opts.callback {
             body = obj.stdout or '',
             exit = obj.code,
             error = obj.stderr or '',
-        })
+        }
     end)
 end
 

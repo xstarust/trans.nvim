@@ -5,7 +5,7 @@ return {
             bold = true,
         },
         TransPhonetic = {
-            link = 'Linenr'
+            link = 'Linenr',
         },
         TransTitle = {
             fg = '#0f0f15',
@@ -17,7 +17,7 @@ return {
         },
         TransTag = {
             -- fg = '#e5c07b',
-            link = '@tag'
+            link = '@tag',
         },
         TransExchange = {
             link = 'TransTag',
@@ -45,12 +45,12 @@ return {
             fg = '#7aa89f',
         },
         TransWaitting = {
-            link = 'MoreMsg'
+            link = 'MoreMsg',
         },
         TransWeb = {
             -- TODO :
             link = 'MoreMsg',
-        }
+        },
     },
 
     --- TODO :
@@ -99,7 +99,7 @@ return {
             fg = '#f4b085',
         },
         TransWaitting = {
-            link = 'MoreMsg'
+            link = 'MoreMsg',
         },
     },
     dracula = {
@@ -147,7 +147,7 @@ return {
             fg = '#8be9fd',
         },
         TransWaitting = {
-            link = 'MoreMsg'
+            link = 'MoreMsg',
         },
     },
     catppuccin = {
@@ -195,8 +195,7 @@ return {
             fg = '#ea999c',
         },
         TransWaitting = {
-            link = 'MoreMsg'
+            link = 'MoreMsg',
         },
     },
-
 }

@@ -9,7 +9,7 @@ local function check_sdcv()
     end
     health.ok(('sdcv executable [%s] found'):format(cmd))
 
-    local output = vim.fn.system({ cmd, '-l' })
+    local output = vim.fn.system { cmd, '-l' }
     if vim.v.shell_error == 0 and output ~= '' then
         health.ok('Dictionaries:\n' .. output)
     else

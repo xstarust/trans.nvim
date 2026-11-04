@@ -40,11 +40,11 @@ end
 ---@param data TransData
 ---@return string
 function M.get_query(data)
-    return vim.json.encode({
+    return vim.json.encode {
         q = data.str,
         target = data.from == 'en' and 'zh-CN' or 'en',
         format = 'text',
-    })
+    }
 end
 
 ---@param body table

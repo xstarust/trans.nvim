@@ -19,9 +19,9 @@ local strategy = {
         window:try_close()
 
         window = hover:init_window {
-            col      = col,
-            width    = width,
-            height   = height,
+            col = col,
+            width = width,
+            height = height,
             relative = 'editor',
         }
 

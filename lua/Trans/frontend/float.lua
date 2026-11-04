@@ -5,10 +5,7 @@ local M = {}
 
 function M.new()
     -- TODO :
-
 end
-
-
 
 return M
 -- local function set_tag_hl(name, status)

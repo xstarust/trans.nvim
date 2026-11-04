@@ -1,4 +1,4 @@
-local node = require 'Trans'.util.node
+local node = require('Trans').util.node
 local it, t, f, pr = node.item, node.text, node.format, node.prompt
 
 ---@type TransHoverRenderer
@@ -6,7 +6,9 @@ local M = {}
 local interval = (' '):rep(4)
 
 function M.web(hover, result)
-    if not result.web then return end
+    if not result.web then
+        return
+    end
     local buffer = hover.buffer
     buffer:setline(pr(hover.opts.icon.web .. ' 网络释义'))
 
@@ -32,13 +34,13 @@ function M.web(hover, result)
     for _, w in ipairs(result.web) do
         buffer:setline(it {
             interval .. w.key,
-            'TransWeb'
+            'TransWeb',
         })
 
         for _, v in ipairs(remove_duplicate(w.value)) do
             buffer:setline(it {
                 indent .. v,
-                'TransWeb'
+                'TransWeb',
             })
         end
     end
@@ -47,21 +49,21 @@ end
 
 function M.explains(hover, result)
     local explains = result.explains
-    if not explains then return end
+    if not explains then
+        return
+    end
     local buffer = hover.buffer
     buffer:setline(pr '基本释义')
 
-
     for i = 1, #explains, 2 do
         buffer:setline(it {
-            interval .. explains[i] ..
-            (explains[i + 1] and interval .. explains[i + 1] or ''),
-            'TransExplains'
+            interval .. explains[i] .. (explains[i + 1] and interval .. explains[i + 1] or ''),
+            'TransExplains',
         })
     end
     buffer:setline ''
 end
 
-M.title = require 'Trans'.frontend.hover.offline.title
+M.title = require('Trans').frontend.hover.offline.title
 
 return M

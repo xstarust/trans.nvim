@@ -106,7 +106,6 @@ function buffer:setline(nodes, one_index)
         end
     end
 
-
     if type(nodes) == 'string' then
         fn.setbufline(self.bufnr, one_index, nodes)
         return
@@ -118,7 +117,6 @@ function buffer:setline(nodes, one_index)
         nodes:render(self, one_index, 0)
         return
     end
-
 
     local strs = {}
     local num = #nodes
@@ -137,7 +135,7 @@ end
 
 ---Process lines within the buffer to handle Chinese punctuation
 function buffer:process_chinese_punctuation()
-    local util = require('Trans.core.util')
+    local util = require 'Trans.core.util'
     local lines = self:lines(1, -1)
     for i, line in ipairs(lines) do
         lines[i] = util.replace_chinese_punctuation(line)

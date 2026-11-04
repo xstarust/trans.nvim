@@ -1,4 +1,4 @@
-local node = require 'Trans'.util.node
+local node = require('Trans').util.node
 local it, pr = node.item, node.prompt
 local interval = (' '):rep(4)
 
@@ -24,30 +24,30 @@ local default = {
     end,
     translation = function(hover, result)
         local translation = result.translation
-        if not translation then return end
+        if not translation then
+            return
+        end
 
         local buffer = hover.buffer
         buffer:setline(pr(hover.opts.icon.translation .. ' 中文翻译'))
 
         for _, value in ipairs(translation) do
-            buffer:setline(
-                it { interval .. value, 'TransTranslation' }
-            )
+            buffer:setline(it { interval .. value, 'TransTranslation' })
         end
 
         buffer:setline ''
     end,
     definition = function(hover, result)
         local definition = result.definition
-        if not definition then return end
+        if not definition then
+            return
+        end
 
         local buffer = hover.buffer
         buffer:setline(pr(hover.opts.icon.definition .. ' 英文注释'))
 
         for _, value in ipairs(definition) do
-            buffer:setline(
-                it { interval .. value, 'TransDefinition' }
-            )
+            buffer:setline(it { interval .. value, 'TransDefinition' })
         end
 
         buffer:setline ''
@@ -65,7 +65,6 @@ M.renderer = setmetatable({}, {
         return tbl[key]
     end,
 })
-
 
 ---@class TransHover
 ---@field load fun(hover: TransHover, result: TransResult, name: string, order: string[])

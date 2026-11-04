@@ -1,7 +1,7 @@
 local fn, api = vim.fn, vim.api
 
 ---@class TransUtil
-local M = require 'Trans'.metatable 'util'
+local M = require('Trans').metatable 'util'
 
 ---Replace full-width Chinese punctuation with English punctuation
 ---@param str string The input text containing Chinese punctuation
@@ -58,14 +58,14 @@ end
 ---Get selected text
 ---@return string
 function M.get_lines()
-  local s_row, e_row = unpack(M.get_range())
+    local s_row, e_row = unpack(M.get_range())
 
-  if s_row == e_row then
-    return fn.getline(s_row)
-  else
-    local lines = fn.getline(s_row, e_row)
-    return table.concat(lines, " ")
-  end
+    if s_row == e_row then
+        return fn.getline(s_row)
+    else
+        local lines = fn.getline(s_row, e_row)
+        return table.concat(lines, ' ')
+    end
 end
 
 ---Get selected text
@@ -85,9 +85,9 @@ function M.get_block()
     else
         local lines = fn.getline(s_row, e_row)
         for col, l in pairs(lines) do
-          lines[col] = l:sub(s_col,e_col)
+            lines[col] = l:sub(s_col, e_col)
         end
-        return table.concat(lines, " ")
+        return table.concat(lines, ' ')
     end
 end
 
@@ -223,18 +223,17 @@ end
 ---@param opts { winid: integer, height: integer }?
 ---@return string[]
 function M.visible_lines(opts)
-    opts                        = opts or {}
+    opts = opts or {}
 
     -- TODO : Use getpos('w0') and getpos('w$') to get the visible lines
     -- INFO : don't calculate the height of statusline and cmdheight or winbar?
-    local winid                 = opts.winid or 0
-    local win_height            = opts.height or api.nvim_win_get_height(winid)
-    local current_line          = api.nvim_win_get_cursor(winid)[1]
+    local winid = opts.winid or 0
+    local win_height = opts.height or api.nvim_win_get_height(winid)
+    local current_line = api.nvim_win_get_cursor(winid)[1]
     local current_relative_line = vim.fn.winline()
 
-
     local _start = current_line - current_relative_line
-    local _end   = _start + win_height - vim.o.cmdheight --[[ - 1 -- maybe 1 for statusline?? ]]
+    local _end = _start + win_height - vim.o.cmdheight --[[ - 1 -- maybe 1 for statusline?? ]]
 
     return api.nvim_buf_get_lines(0, _start, _end, false)
 end
@@ -354,7 +353,9 @@ end
 function M.list_concat(list, step)
     local size = #list
     local ret = { list[1] }
-    if size <= 1 then return ret end
+    if size <= 1 then
+        return ret
+    end
     for i = 2, size do
         ret[i * 2 - 2] = step
         ret[i * 2 - 1] = list[i]
