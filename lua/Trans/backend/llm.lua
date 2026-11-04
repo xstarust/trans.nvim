@@ -31,6 +31,10 @@ local function endpoint(base_url)
     return url .. '/chat/completions'
 end
 
+-- opencode Go routes on this header and rejects requests without it; other gateways ignore it.
+-- conf.backends.llm.session_id overrides this per-process default.
+local default_session = ('trans-nvim-%d-%d'):format(vim.fn.getpid(), os.time())
+
 setmetatable(M, {
     __index = function(_, key)
         if key ~= 'uri' then
@@ -74,10 +78,18 @@ end
 
 ---@return table<string, string>
 function M.header()
-    return {
+    local headers = {
         Authorization = 'Bearer ' .. (resolve().api_key or ''),
         ['Content-Type'] = 'application/json',
+        ['User-Agent'] = M.user_agent or 'trans.nvim',
+        ['x-opencode-session'] = M.session_id or default_session,
     }
+
+    for name, value in pairs(M.headers or {}) do
+        headers[name] = value
+    end
+
+    return headers
 end
 
 ---@param body table

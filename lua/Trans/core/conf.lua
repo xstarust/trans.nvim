@@ -22,6 +22,12 @@ return {
             api_key = vim.env.OPENAI_API_KEY,
             temperature = 0.2,
             timeout = 25,
+            ---@type string Sent as User-Agent
+            user_agent = 'trans.nvim',
+            ---@type string? Sent as x-opencode-session; generated per Neovim process when nil
+            session_id = nil,
+            ---@type table<string, string> Extra request headers, merged last
+            headers = {},
         },
         google = {
             api_key = vim.env.GOOGLE_TRANSLATE_API_KEY,
